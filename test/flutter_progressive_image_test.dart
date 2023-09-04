@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:flutter_progressive_image/progressive_converter.dart';
+import 'package:flutter_progressive_image/src/progressive_converter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final sample = Uint8List.fromList(<int>[

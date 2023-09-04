@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_progressive_image/flutter_progressive_image.dart';
+import 'package:flutter_progressive_image/progressive_image.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,9 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Image(
-            image: ProgressiveImage(url),
+            image: ProgressiveImage(
+              url,
+            ),
             fit: BoxFit.contain,
           ),
         ),

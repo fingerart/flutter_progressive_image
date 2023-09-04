@@ -60,7 +60,6 @@ class ProgressiveConverterSink extends ByteConversionSinkBase {
     _sosState = sosState;
     if (detects?.isNotEmpty == true) {
       for (var offset in detects!) {
-        print('sos: $offset');
         if (_sosCounter > 0) {
           _emit(_contentLength - (chunk.length - offset), true);
         }
@@ -80,11 +79,11 @@ class ProgressiveConverterSink extends ByteConversionSinkBase {
     if (_chunks?.isNotEmpty != true) return;
 
     final bytes = Uint8List(appendEnd ? len + 2 : len);
-    int offset = 0, remaind = 0, chunkLen = 0;
+    int offset = 0, remainder = 0, chunkLen = 0;
     for (final List<int> chunk in _chunks!) {
-      remaind = len - offset;
-      if (remaind > 1) {
-        chunkLen = min(remaind, chunk.length);
+      remainder = len - offset;
+      if (remainder > 1) {
+        chunkLen = min(remainder, chunk.length);
         bytes.setRange(offset, offset + chunkLen, chunk);
         offset += chunkLen;
       } else {

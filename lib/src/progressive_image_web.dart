@@ -1,20 +1,31 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide BytesReceivedCallback;
 import 'package:flutter/widgets.dart';
-import 'package:flutter_progressive_image/image_loader.dart';
-import 'package:flutter_progressive_image/progressive_image.dart'
-    as image_provider;
+
+import 'image_loader.dart';
+import 'progressive_image.dart' as image_provider;
 
 class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     implements image_provider.ProgressiveImage {
-  ProgressiveImage(this.url, {this.scale = 1.0});
+  ProgressiveImage(
+    this.url, {
+    this.scale = 1.0,
+    this.headers,
+    this.imageLoader = const DefaultProgressiveImageWebLoader(),
+  });
 
   @override
   final String url;
 
   @override
   final double scale;
+
+  @override
+  final Map<String, String>? headers;
+
+  @override
+  final ProgressiveImageLoader imageLoader;
 
   @override
   Future<image_provider.ProgressiveImage> obtainKey(
@@ -81,9 +92,39 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ProgressiveImage && runtimeType == other.runtimeType;
+      other is ProgressiveImage &&
+          runtimeType == other.runtimeType &&
+          url == other.url &&
+          scale == other.scale &&
+          headers == other.headers &&
+          imageLoader == other.imageLoader;
 
   @override
-  // TODO: implement imageLoader
-  ProgressiveImageLoader get imageLoader => throw UnimplementedError();
+  int get hashCode =>
+      url.hashCode ^ scale.hashCode ^ headers.hashCode ^ imageLoader.hashCode;
+}
+
+
+class DefaultProgressiveImageWebLoader extends ProgressiveImageLoader {
+  const DefaultProgressiveImageWebLoader();
+
+  @override
+  Stream<List<int>> load(
+      image_provider.ProgressiveImage key,
+      BytesReceivedCallback onBytesReceived,
+      ) async* {
+
+    final Uri resolved = Uri.base.resolve(key.url);
+
+    final bool containsNetworkImageHeaders = key.headers?.isNotEmpty ?? false;
+
+    /*int bytesReceived = 0;
+    yield* stream.map((chunk) {
+      bytesReceived += chunk.length;
+      try {
+        onBytesReceived(bytesReceived, expectedContentLength);
+      } catch (_) {}
+      return chunk;
+    });*/
+  }
 }
