@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_progressive_image/flutter_progressive_image.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +38,7 @@ class _MyAppState extends State<MyApp> {
             const SizedBox(height: 15),
             Expanded(
               child: Image(
-                image: NetworkImage(url),
+                image: ProgressiveImage(url),
                 frameBuilder: _buildFrameBuilder,
                 errorBuilder: _buildImageError,
               ),
@@ -112,7 +113,7 @@ class _MyAppState extends State<MyApp> {
         }
       },
     );
-    NetworkImage(url)
+    ProgressiveImage(url)
         .resolve(ImageConfiguration.empty)
         .addListener(streamListener);
   }

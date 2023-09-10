@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import '../progressive_image.dart';
+import '../flutter_progressive_image.dart';
 
 /// Image bytes received callback
 typedef BytesReceivedCallback = void Function(int cumulative, int? total);

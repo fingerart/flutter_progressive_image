@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:async';
 import 'dart:html';
 import 'dart:typed_data';
@@ -40,34 +42,6 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
   }
 
   @override
-  ImageStreamCompleter load(
-      image_provider.ProgressiveImage key, DecoderCallback decode) {
-    final StreamController<ImageChunkEvent> chunkEvents =
-        StreamController<ImageChunkEvent>();
-
-    return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(key, chunkEvents, decodeDeprecated: decode),
-      chunkEvents: chunkEvents.stream,
-      scale: key.scale,
-    );
-  }
-
-  @override
-  ImageStreamCompleter loadBuffer(
-    image_provider.ProgressiveImage key,
-    DecoderBufferCallback decode,
-  ) {
-    final StreamController<ImageChunkEvent> chunkEvents =
-        StreamController<ImageChunkEvent>();
-
-    return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(key, chunkEvents, decodeBufferDeprecated: decode),
-      chunkEvents: chunkEvents.stream,
-      scale: key.scale,
-    );
-  }
-
-  @override
   ImageStreamCompleter loadImage(
     image_provider.ProgressiveImage key,
     ImageDecoderCallback decode,
@@ -86,8 +60,6 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     image_provider.ProgressiveImage key,
     StreamController<ImageChunkEvent> chunkEvents, {
     ImageDecoderCallback? decode,
-    DecoderBufferCallback? decodeBufferDeprecated,
-    DecoderCallback? decodeDeprecated,
   }) async* {
     final Uri resolved = Uri.base.resolve(key.url);
 
@@ -106,12 +78,7 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
       yield* imageLoader
           .load(key, onBytesReceived)
           .transform(const ProgressiveConverter())
-          .asyncMap((event) => emitCodec(
-                Uint8List.fromList(event),
-                decode,
-                decodeBufferDeprecated,
-                decodeDeprecated,
-              ));
+          .asyncMap((event) => emitCodec(Uint8List.fromList(event), decode!));
       return;
     }
 

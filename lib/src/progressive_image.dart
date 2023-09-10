@@ -26,21 +26,13 @@ abstract class ProgressiveImage extends ImageProvider<ProgressiveImage> {
 }
 
 Future<ui.Codec> emitCodec(
-    Uint8List bytes,
-    ImageDecoderCallback? decode,
-    DecoderBufferCallback? decodeBufferDeprecated,
-    DecoderCallback? decodeDeprecated,
-    ) async {
-  if (decode != null) {
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    return decode(buffer);
-  } else if (decodeBufferDeprecated != null) {
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    return decodeBufferDeprecated(buffer);
-  } else {
-    assert(decodeDeprecated != null);
-    return decodeDeprecated!(bytes);
-  }
+  Uint8List bytes,
+  ImageDecoderCallback decode,
+  // DecoderBufferCallback? decodeBufferDeprecated,
+  // DecoderCallback? decodeDeprecated,
+) async {
+  final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+  return decode(buffer);
 }
 
 class ProgressiveImageStreamCompleter extends ImageStreamCompleter {

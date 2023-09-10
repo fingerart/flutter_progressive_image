@@ -40,32 +40,6 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
   }
 
   @override
-  ImageStreamCompleter load(
-      image_provider.ProgressiveImage key, DecoderCallback decode) {
-    final chunkEvents = StreamController<ImageChunkEvent>();
-
-    return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(key, chunkEvents, decodeDeprecated: decode),
-      chunkEvents: chunkEvents.stream,
-      scale: key.scale,
-    );
-  }
-
-  @override
-  ImageStreamCompleter loadBuffer(
-    image_provider.ProgressiveImage key,
-    DecoderBufferCallback decode,
-  ) {
-    final chunkEvents = StreamController<ImageChunkEvent>();
-
-    return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(key, chunkEvents, decodeBufferDeprecated: decode),
-      chunkEvents: chunkEvents.stream,
-      scale: key.scale,
-    );
-  }
-
-  @override
   ImageStreamCompleter loadImage(
     image_provider.ProgressiveImage key,
     ImageDecoderCallback decode,
@@ -83,8 +57,6 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     image_provider.ProgressiveImage key,
     StreamController<ImageChunkEvent> chunkEvents, {
     ImageDecoderCallback? decode,
-    DecoderBufferCallback? decodeBufferDeprecated,
-    DecoderCallback? decodeDeprecated,
   }) async* {
     assert(key == this);
 
@@ -99,14 +71,7 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
       yield* imageLoader
           .load(key, onBytesReceived)
           .transform(const ProgressiveConverter())
-          .asyncMap(
-            (event) => emitCodec(
-              event,
-              decode,
-              decodeBufferDeprecated,
-              decodeDeprecated,
-            ),
-          );
+          .asyncMap((event) => emitCodec(event, decode!));
     } catch (_) {
       // Depending on where the exception was thrown, the image cache may not
       // have had a chance to track the key in the cache at all.
