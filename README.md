@@ -14,10 +14,10 @@ A progressive image widget for flutter.
 
 ## Preview
 
-| Progressive                                                      | General                                                 |
-|------------------------------------------------------------------|---------------------------------------------------------|
-| ![progressive_image](./arts/progressive_image.gif)               | ![general_image](./arts/general_image.gif)              |
-| 📺 ![progressive image demo video](./arts/progressive_image.mp4) | 📺 [general image demo video](./arts/general_image.mp4) |
+| Progressive                                                     | General                                                 |
+|-----------------------------------------------------------------|---------------------------------------------------------|
+| ![progressive_image](./arts/progressive_image.gif)              | ![general_image](./arts/general_image.gif)              |
+| 📺 [progressive image demo video](./arts/progressive_image.mp4) | 📺 [general image demo video](./arts/general_image.mp4) |
 
 ## Supported image formats
 
