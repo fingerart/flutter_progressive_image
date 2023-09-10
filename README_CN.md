@@ -29,7 +29,7 @@
 
 ```yaml
 dependencies:
-  flutter_progressive_image: ^0.0.1+1
+  flutter_progressive_image: ^0.0.2
 ```
 
 ```dart
