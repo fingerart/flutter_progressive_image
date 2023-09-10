@@ -93,6 +93,7 @@ class ProgressiveConverterSink extends ByteConversionSinkBase {
     if (appendEnd) {
       bytes.setRange(offset, offset + 2, _jpegEnd);
     }
+    // print('emit progressive frame: ${bytes.length} - ${DateTime.now().millisecondsSinceEpoch}');
     _target.add(bytes);
   }
 

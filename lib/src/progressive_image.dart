@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
@@ -6,8 +7,6 @@ import 'package:flutter/widgets.dart';
 import 'image_loader.dart';
 import 'progressive_image_io.dart'
     if (dart.library.js_util) 'progressive_image_web.dart' as progressive_image;
-
-typedef ProgressiveFrame = ui.Codec;
 
 abstract class ProgressiveImage extends ImageProvider<ProgressiveImage> {
   double get scale;
@@ -26,17 +25,35 @@ abstract class ProgressiveImage extends ImageProvider<ProgressiveImage> {
   }) = progressive_image.ProgressiveImage;
 }
 
+Future<ui.Codec> emitCodec(
+    Uint8List bytes,
+    ImageDecoderCallback? decode,
+    DecoderBufferCallback? decodeBufferDeprecated,
+    DecoderCallback? decodeDeprecated,
+    ) async {
+  if (decode != null) {
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+    return decode(buffer);
+  } else if (decodeBufferDeprecated != null) {
+    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
+    return decodeBufferDeprecated(buffer);
+  } else {
+    assert(decodeDeprecated != null);
+    return decodeDeprecated!(bytes);
+  }
+}
+
 class ProgressiveImageStreamCompleter extends ImageStreamCompleter {
   final double scale;
   StreamSubscription? _frameSubscription;
   StreamSubscription? _chunkSubscription;
 
-  ProgressiveFrame? _currentCodec;
+  ui.Codec? _currentCodec;
   ui.FrameInfo? _currentFrame;
   bool _hasEmitFrame = false;
 
   ProgressiveImageStreamCompleter({
-    required Stream<ProgressiveFrame> frameEvents,
+    required Stream<ui.Codec> frameEvents,
     Stream<ImageChunkEvent>? chunkEvents,
     required this.scale,
   }) {
@@ -67,7 +84,7 @@ class ProgressiveImageStreamCompleter extends ImageStreamCompleter {
     }
   }
 
-  void _progressiveImageHandle(ProgressiveFrame frame) {
+  void _progressiveImageHandle(ui.Codec frame) {
     _currentCodec = frame;
     assert(_currentCodec != null);
 

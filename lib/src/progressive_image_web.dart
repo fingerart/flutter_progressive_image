@@ -1,14 +1,19 @@
 import 'dart:async';
+import 'dart:html';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart' hide BytesReceivedCallback;
 import 'package:flutter/widgets.dart';
+import 'package:flutter_progressive_image/src/progressive_converter.dart';
 
 import 'image_loader.dart';
 import 'progressive_image.dart' as image_provider;
+import 'progressive_image.dart';
 
 class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     implements image_provider.ProgressiveImage {
-  ProgressiveImage(
+  const ProgressiveImage(
     this.url, {
     this.scale = 1.0,
     this.headers,
@@ -41,7 +46,7 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
         StreamController<ImageChunkEvent>();
 
     return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(chunkEvents, decodeDeprecated: decode),
+      frameEvents: _loadAsync(key, chunkEvents, decodeDeprecated: decode),
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
     );
@@ -56,7 +61,7 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
         StreamController<ImageChunkEvent>();
 
     return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(chunkEvents, decodeBufferDeprecated: decode),
+      frameEvents: _loadAsync(key, chunkEvents, decodeBufferDeprecated: decode),
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
     );
@@ -71,22 +76,53 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
         StreamController<ImageChunkEvent>();
 
     return image_provider.ProgressiveImageStreamCompleter(
-      frameEvents: _loadAsync(chunkEvents, decode: decode),
+      frameEvents: _loadAsync(key, chunkEvents, decode: decode),
       chunkEvents: chunkEvents.stream,
       scale: key.scale,
     );
   }
 
-  Stream<image_provider.ProgressiveFrame> _loadAsync(
+  Stream<ui.Codec> _loadAsync(
+    image_provider.ProgressiveImage key,
     StreamController<ImageChunkEvent> chunkEvents, {
     ImageDecoderCallback? decode,
     DecoderBufferCallback? decodeBufferDeprecated,
     DecoderCallback? decodeDeprecated,
   }) async* {
-    final bytes = Uint8List(0);
-    const isEnd = false;
+    final Uri resolved = Uri.base.resolve(key.url);
 
-    throw UnimplementedError();
+    onBytesReceived(int cumulative, int? total) {
+      chunkEvents.add(ImageChunkEvent(
+        cumulativeBytesLoaded: cumulative,
+        expectedTotalBytes: total,
+      ));
+    }
+
+    final bool containsNetworkImageHeaders = key.headers?.isNotEmpty ?? false;
+
+    // We use a different method when headers are set because the
+    // `ui.webOnlyInstantiateImageCodecFromUrl` method is not capable of handling headers.
+    if (isCanvasKit || containsNetworkImageHeaders) {
+      yield* imageLoader
+          .load(key, onBytesReceived)
+          .transform(const ProgressiveConverter())
+          .asyncMap((event) => emitCodec(
+                Uint8List.fromList(event),
+                decode,
+                decodeBufferDeprecated,
+                decodeDeprecated,
+              ));
+      return;
+    }
+
+    // This API only exists in the web engine implementation and is not
+    // contained in the analyzer summary for Flutter.
+    // ignore: undefined_function, avoid_dynamic_calls
+    yield* (ui.webOnlyInstantiateImageCodecFromUrl(
+      resolved,
+      chunkCallback: onBytesReceived,
+    ) as Future<ui.Codec>)
+        .asStream();
   }
 
   @override
@@ -104,27 +140,21 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
       url.hashCode ^ scale.hashCode ^ headers.hashCode ^ imageLoader.hashCode;
 }
 
-
 class DefaultProgressiveImageWebLoader extends ProgressiveImageLoader {
   const DefaultProgressiveImageWebLoader();
 
   @override
   Stream<List<int>> load(
-      image_provider.ProgressiveImage key,
-      BytesReceivedCallback onBytesReceived,
-      ) async* {
+    image_provider.ProgressiveImage key,
+    BytesReceivedCallback onBytesReceived,
+  ) async* {
+    final resp = await HttpRequest.request(
+      key.url,
+      responseType: 'arraybuffer',
+      requestHeaders: key.headers,
+      onProgress: (e) => onBytesReceived(e.loaded ?? 0, e.total),
+    );
 
-    final Uri resolved = Uri.base.resolve(key.url);
-
-    final bool containsNetworkImageHeaders = key.headers?.isNotEmpty ?? false;
-
-    /*int bytesReceived = 0;
-    yield* stream.map((chunk) {
-      bytesReceived += chunk.length;
-      try {
-        onBytesReceived(bytesReceived, expectedContentLength);
-      } catch (_) {}
-      return chunk;
-    });*/
+    yield (resp.response as ByteBuffer).asUint8List();
   }
 }

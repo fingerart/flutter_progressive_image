@@ -8,11 +8,12 @@ import 'package:flutter/widgets.dart';
 import 'image_loader.dart';
 import 'progressive_converter.dart';
 import 'progressive_image.dart' as image_provider;
+import 'progressive_image.dart';
 
 /// ProgressiveImage provider
 class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     implements image_provider.ProgressiveImage {
-  ProgressiveImage(
+  const ProgressiveImage(
     this.url, {
     this.scale = 1.0,
     this.headers,
@@ -78,7 +79,7 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
     );
   }
 
-  Stream<image_provider.ProgressiveFrame> _loadAsync(
+  Stream<ui.Codec> _loadAsync(
     image_provider.ProgressiveImage key,
     StreamController<ImageChunkEvent> chunkEvents, {
     ImageDecoderCallback? decode,
@@ -98,10 +99,14 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
       yield* imageLoader
           .load(key, onBytesReceived)
           .transform(const ProgressiveConverter())
-          .asyncMap((event) {
-        return _emitCodec(
-            event, decode, decodeBufferDeprecated, decodeDeprecated);
-      });
+          .asyncMap(
+            (event) => emitCodec(
+              event,
+              decode,
+              decodeBufferDeprecated,
+              decodeDeprecated,
+            ),
+          );
     } catch (_) {
       // Depending on where the exception was thrown, the image cache may not
       // have had a chance to track the key in the cache at all.
@@ -128,24 +133,6 @@ class ProgressiveImage extends ImageProvider<image_provider.ProgressiveImage>
   @override
   int get hashCode =>
       url.hashCode ^ scale.hashCode ^ headers.hashCode ^ imageLoader.hashCode;
-}
-
-Future<image_provider.ProgressiveFrame> _emitCodec(
-  Uint8List bytes,
-  ImageDecoderCallback? decode,
-  DecoderBufferCallback? decodeBufferDeprecated,
-  DecoderCallback? decodeDeprecated,
-) async {
-  if (decode != null) {
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    return decode(buffer);
-  } else if (decodeBufferDeprecated != null) {
-    final buffer = await ui.ImmutableBuffer.fromUint8List(bytes);
-    return decodeBufferDeprecated(buffer);
-  } else {
-    assert(decodeDeprecated != null);
-    return decodeDeprecated!(bytes);
-  }
 }
 
 class DefaultProgressiveImageIOLoader extends ProgressiveImageLoader {
