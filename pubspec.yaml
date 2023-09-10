@@ -1,9 +1,9 @@
 name: flutter_progressive_image
 description: A progressive image widget for flutter.
-version: 0.0.2
+version: 0.0.4
 homepage: https://github.com/fingerart/flutter_progressive_image
 screenshots:
-  - description: 'progressive image example.'
+  - description: 'progressive image demo.'
     path: arts/progressive_image.gif
 
 environment:

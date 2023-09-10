@@ -14,10 +14,10 @@ A progressive image widget for flutter.
 
 ## Preview
 
-| Progressive                                                     | General                                                 |
-|-----------------------------------------------------------------|---------------------------------------------------------|
-| ![progressive_image](./arts/progressive_image.gif)              | ![general_image](./arts/general_image.gif)              |
-| 📺 [progressive image demo video](./arts/progressive_image.mp4) | 📺 [general image demo video](./arts/general_image.mp4) |
+| Progressive                                                                                                       | General                                                                                                   |
+|-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| ![progressive_image](https://github.com/fingerart/flutter_progressive_image/blob/main/arts/progressive_image.gif) | ![general_image](https://github.com/fingerart/flutter_progressive_image/blob/main/arts/general_image.gif) |
+| 📺 [progressive image demo video](./arts/progressive_image.mp4)                                                   | 📺 [general image demo video](./arts/general_image.mp4)                                                   |
 
 ## Supported image formats
 
@@ -29,7 +29,7 @@ A progressive image widget for flutter.
 
 ```yaml
 dependencies:
-  flutter_progressive_image: ^0.0.2
+  flutter_progressive_image: ^0.0.4
 ```
 
 ```dart
