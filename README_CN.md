@@ -16,7 +16,7 @@
 
 | 渐进式                                                                                                               | 普通                                                                                                        |
 |-------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
-| ![progressive_image](https://github.com/fingerart/flutter_progressive_image/blob/main/arts/progressive_image.gif) | ![general_image](https://github.com/fingerart/flutter_progressive_image/blob/main/arts/general_image.gif) |
+| ![progressive_image](https://raw.githubusercontent.com/fingerart/flutter_progressive_image/main/arts/progressive_image.gif) | ![general_image](https://raw.githubusercontent.com/fingerart/flutter_progressive_image/main/arts/general_image.gif) |
 | 📺 [progressive image demo video](./arts/progressive_image.mp4)                                                   | 📺 [general image demo video](./arts/general_image.mp4)                                                   |
 
 ## 支持的图片格式
@@ -29,7 +29,7 @@
 
 ```yaml
 dependencies:
-  flutter_progressive_image: ^0.0.4
+  flutter_progressive_image: ^0.0.5
 ```
 
 ```dart

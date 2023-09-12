@@ -29,7 +29,7 @@ A progressive image widget for flutter.
 
 ```yaml
 dependencies:
-  flutter_progressive_image: ^0.0.4
+  flutter_progressive_image: ^0.0.5
 ```
 
 ```dart
