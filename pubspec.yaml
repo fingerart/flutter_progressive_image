@@ -1,5 +1,5 @@
 name: flutter_progressive_image
-description: A progressive image widget for flutter.
+description: A progressive image widget for flutter and provides custom image loader to do more.
 version: 0.0.4
 homepage: https://github.com/fingerart/flutter_progressive_image
 screenshots:
